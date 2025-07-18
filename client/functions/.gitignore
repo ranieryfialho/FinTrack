@@ -1,0 +1,38 @@
+# Firebase/Google Cloud credentials
+serviceAccountKey.json
+**/serviceAccountKey.json
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# LogsQ
+*.log
+logs/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Criar ou editar .gitignore na raiz do projeto
+echo "serviceAccountKey.json
+**/serviceAccountKey.json
+.env
+.env.local
+node_modules/
+dist/
+build/
+*.log" >> .gitignore
+**/serviceAccountKey.json
