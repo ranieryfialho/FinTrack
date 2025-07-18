@@ -4,7 +4,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { useAuth, AuthProvider } from "./context/AuthContext";
+import { useAuth } from "./context/AuthContext";
 
 import MainLayout from "./layouts/MainLayout";
 import Auth from "./pages/Auth";
@@ -16,33 +16,6 @@ import ManageEnvironment from "./pages/ManageEnvironment";
 import AnalysisPage from "./pages/AnalysisPage";
 import GoalsPage from "./pages/GoalsPage";
 
-function PrivateRoute({ children }) {
-  const { currentUser, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="w-screen h-screen flex justify-center items-center bg-dark-bg-primary">
-        <div className="loader"></div>
-      </div>
-    );
-  }
-
-  return currentUser ? children : <Navigate to="/auth" />;
-}
-
-function OnboardingRoute({ children }) {
-  const { userProfile, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="w-screen h-screen flex justify-center items-center bg-dark-bg-primary">
-        <div className="loader"></div>
-      </div>
-    );
-  }
-  return userProfile && userProfile.ambienteId ? children : <Navigate to="/onboarding" />;
-}
-
 
 function AppContent() {
   const { currentUser, loading, userProfile, pendingInvites } = useAuth();
@@ -50,55 +23,69 @@ function AppContent() {
   if (loading) {
     return (
       <div className="w-screen h-screen flex justify-center items-center bg-dark-bg-primary">
-        <p className="text-white">Carregando...</p>
+        <div className="loader"></div>
       </div>
     );
   }
-  
-  // Se o usuário está logado, não tem um ambiente, MAS tem convites, redireciona para a página de convites.
-  if (currentUser && userProfile && !userProfile.ambienteId && pendingInvites && pendingInvites.length > 0) {
-    // Evita loop de redirecionamento se já estiver na página de convite
-    if (window.location.pathname !== '/invite') {
-      return <Navigate to="/invite" />;
-    }
+
+  if (!currentUser) {
+    return (
+      <Routes>
+        <Route path="/auth" element={<Auth />} />
+        <Route path="*" element={<Navigate to="/auth" />} />
+      </Routes>
+    );
+  }
+
+  if (!userProfile) {
+     return (
+      <div className="w-screen h-screen flex justify-center items-center bg-dark-bg-primary">
+        <div className="loader"></div>
+      </div>
+    );
   }
 
   return (
     <Routes>
-      <Route path="/auth" element={currentUser ? <Navigate to="/" /> : <Auth />} />
-      <Route path="/invite" element={<PrivateRoute><InvitePage /></PrivateRoute>} />
-      
-      <Route path="/onboarding" element={
-          <PrivateRoute>
-            {/* Se o usuário já tem um ambiente, vai para o dashboard. Senão, permanece no onboarding */}
-            {userProfile?.ambienteId ? <Navigate to="/" /> : <OnboardingPage />}
-          </PrivateRoute>
-      } />
+      {userProfile.ambienteId ? (
+        <>
+          <Route path="/auth" element={<Navigate to="/" />} />
+          <Route path="/onboarding" element={<Navigate to="/" />} />
+          <Route path="/invite" element={<Navigate to="/" />} />
 
-      <Route path="/" element={
-          <PrivateRoute>
-            <OnboardingRoute>
-              <MainLayout />
-            </OnboardingRoute>
-          </PrivateRoute>
-      }>
-        <Route index element={<Dashboard />} />
-        <Route path="analysis" element={<AnalysisPage />} />
-        <Route path="goals" element={<GoalsPage />} />
-        <Route path="manage-environment" element={<ManageEnvironment />} />
-        <Route path="settings" element={<Settings />} />
-      </Route>
+          <Route path="/" element={<MainLayout />}>
+            <Route index element={<Dashboard />} />
+            <Route path="analysis" element={<AnalysisPage />} />
+            <Route path="goals" element={<GoalsPage />} />
+            <Route path="manage-environment" element={<ManageEnvironment />} />
+            <Route path="settings" element={<Settings />} />
+            <Route path="*" element={<Navigate to="/" />} />
+          </Route>
+        </>
+      ) : (
+        <>
+          {pendingInvites && pendingInvites.length > 0 ? (
+            <>
+              <Route path="/invite" element={<InvitePage />} />
+              <Route path="*" element={<Navigate to="/invite" />} />
+            </>
+          ) : (
+            <>
+              <Route path="/onboarding" element={<OnboardingPage />} />
+              <Route path="*" element={<Navigate to="/onboarding" />} />
+            </>
+          )}
+        </>
+      )}
     </Routes>
   );
 }
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <AppContent />
-      </Router>
-    </AuthProvider>
+    <Router>
+      <AppContent />
+    </Router>
   );
 }
 
