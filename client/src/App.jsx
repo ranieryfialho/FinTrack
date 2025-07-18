@@ -45,7 +45,7 @@ function OnboardingRoute({ children }) {
 
 
 function AppContent() {
-  const { currentUser, loading, userProfile } = useAuth();
+  const { currentUser, loading, userProfile, pendingInvites } = useAuth();
 
   if (loading) {
     return (
@@ -53,6 +53,14 @@ function AppContent() {
         <p className="text-white">Carregando...</p>
       </div>
     );
+  }
+  
+  // Se o usuário está logado, não tem um ambiente, MAS tem convites, redireciona para a página de convites.
+  if (currentUser && userProfile && !userProfile.ambienteId && pendingInvites && pendingInvites.length > 0) {
+    // Evita loop de redirecionamento se já estiver na página de convite
+    if (window.location.pathname !== '/invite') {
+      return <Navigate to="/invite" />;
+    }
   }
 
   return (
@@ -62,6 +70,7 @@ function AppContent() {
       
       <Route path="/onboarding" element={
           <PrivateRoute>
+            {/* Se o usuário já tem um ambiente, vai para o dashboard. Senão, permanece no onboarding */}
             {userProfile?.ambienteId ? <Navigate to="/" /> : <OnboardingPage />}
           </PrivateRoute>
       } />
