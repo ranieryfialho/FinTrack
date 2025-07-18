@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiPlus, FiUpload } from 'react-icons/fi';
+import { FiChevronLeft, FiChevronRight, FiEdit2, FiTrash2, FiPlus, FiUpload, FiLogOut } from 'react-icons/fi';
 import EditTransactionModal from '../components/EditTransactionModal';
 import KPICard from '../components/KPICard';
 import AddTransactionModal from '../components/AddTransactionModal';
@@ -77,7 +78,8 @@ const TransactionsTable = ({ transactions, onEdit, onDelete, onSort, sortConfig,
 };
 
 const Dashboard = () => {
-    const { currentUser, userProfile, loading: authLoading } = useAuth();
+    const { currentUser, userProfile, loading: authLoading, logout } = useAuth();
+    const navigate = useNavigate();
     
     const [transactions, setTransactions] = useState([]);
     const [dataLoading, setDataLoading] = useState(true);
@@ -188,7 +190,16 @@ const Dashboard = () => {
             direction: prevConfig.key === key && prevConfig.direction === 'ascending' ? 'descending' : 'ascending'
         }));
     };
-    
+
+    const handleLogout = async () => {
+        try {
+          await logout();
+          navigate('/auth');
+        } catch (error) {
+          console.error("Falha ao fazer logout", error);
+        }
+    };
+
     const sortedTransactions = useMemo(() => {
         let sortableItems = [...transactions];
         if (sortConfig.key) {
@@ -252,11 +263,18 @@ const Dashboard = () => {
 
     return (
         <div className="p-4 md:p-8 space-y-6">
-            <header className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+            <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-dark-text-primary">Visão Geral</h1>
-                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}!</p>
+                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}! 👋</p>
                 </div>
+                <button 
+                    onClick={handleLogout} 
+                    className="hidden md:flex items-center justify-center gap-2 bg-red-500/20 hover:bg-red-500/40 text-red-400 font-bold py-2 px-4 rounded-lg transition-colors"
+                >
+                    <FiLogOut />
+                    Sair
+                </button>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
