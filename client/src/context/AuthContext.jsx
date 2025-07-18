@@ -69,31 +69,28 @@ export const AuthProvider = ({ children }) => {
     })
   }
 
-  const forceProfileReload = useCallback(
-    async (user) => {
-      if (!user) return;
+  const forceProfileReload = useCallback(async () => {
+    if (!currentUser) return;
+    
+    try {
+      const token = await currentUser.getIdToken(true)
+      const response = await axios.get("/api/user/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setUserProfile(response.data)
       
-      try {
-        const token = await user.getIdToken(true)
-        const response = await axios.get("/api/user/me", {
+      const invitesResponse = await axios.get("/api/invites/me", {
           headers: { Authorization: `Bearer ${token}` },
-        })
-        setUserProfile(response.data)
-        
-        const invitesResponse = await axios.get("/api/invites/me", {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        setPendingInvites(invitesResponse.data);
+      });
+      setPendingInvites(invitesResponse.data);
 
-      } catch (error) {
-        console.error("Falha ao recarregar perfil:", error)
-        if (error.response?.status === 401) {
-          await logout();
-        }
+    } catch (error) {
+      console.error("Falha ao recarregar perfil:", error)
+      if (error.response?.status === 401) {
+        await logout();
       }
-    },
-    [],
-  )
+    }
+  }, [currentUser])
 
   const deleteUserAccount = async (password) => {
     if (!currentUser) throw new Error("Utilizador não autenticado.")
@@ -120,7 +117,7 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser(user)
       
       if (user) {
-        await forceProfileReload(user)
+        await forceProfileReload()
       } else {
         setUserProfile(null)
         setPendingInvites([])

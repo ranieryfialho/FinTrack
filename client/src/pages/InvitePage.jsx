@@ -2,8 +2,9 @@ import { useState, useEffect } from "react"
 import { useAuth } from "../context/AuthContext"
 import axios from "axios"
 
-const InvitePage = ({ onInviteAccepted }) => {
-  const { currentUser, userProfile } = useAuth()
+const InvitePage = () => {
+  // Pegamos a função forceProfileReload diretamente do contexto
+  const { currentUser, userProfile, forceProfileReload } = useAuth()
   const [invites, setInvites] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -48,15 +49,16 @@ const InvitePage = ({ onInviteAccepted }) => {
     }
   }
 
+  // Função de aceitar o convite atualizada
   const handleAcceptInvite = async (inviteId) => {
     try {
       const token = await currentUser.getIdToken()
       await axios.post(`/api/invites/${inviteId}/accept`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       })
-      if (onInviteAccepted) {
-        onInviteAccepted()
-      }
+
+      await forceProfileReload()
+
     } catch (err) {
       setError("Ocorreu um erro ao aceitar o convite.")
       console.error(err)
@@ -132,13 +134,11 @@ const InvitePage = ({ onInviteAccepted }) => {
                         </button>
                         <button
                           onClick={() => {
-                            setSelectedInvite(null)
-                            setInvitePreview(null)
                             handleAcceptInvite(invite.id)
                           }}
                           className="flex-1 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg"
                         >
-                          Confirmar
+                          Confirmar e Entrar
                         </button>
                       </div>
                     </div>
