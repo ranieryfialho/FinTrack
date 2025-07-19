@@ -98,8 +98,10 @@ const AddTransactionForm = ({ onTransactionAdded }) => {
           </div>
           <div className="md:col-span-2 relative">
             <label className="block text-dark-text-secondary text-sm font-bold mb-2">Data</label>
-            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="bg-dark-bg-secondary text-dark-text-primary rounded w-full py-2 px-3 no-calendar-picker-icon" />
-            <FiCalendar className="absolute right-3 top-9 text-dark-text-secondary pointer-events-none" />
+            {/* O padding da direita (pr-8) foi removido no mobile e adicionado apenas para desktop (md:pr-8) */}
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required className="bg-dark-bg-secondary text-dark-text-primary rounded w-full py-2 px-3 md:pr-8 no-calendar-picker-icon" />
+            {/* AQUI: O ícone agora fica escondido ('hidden') e só aparece em ecrãs médios ou maiores ('md:block') */}
+            <FiCalendar className="hidden md:block absolute right-3 top-9 text-dark-text-secondary pointer-events-none" />
           </div>
         </div>
 

@@ -34,13 +34,15 @@ const TransactionFilters = ({ filters, setFilters }) => {
       <div className="flex items-center justify-center gap-2 w-full md:w-auto flex-grow">
         <div className="relative w-1/2 md:w-auto">
           <label className="text-xs text-dark-text-secondary absolute -top-2 left-2 bg-dark-card px-1 z-10">De</label>
-          <input type="date" name="startDate" value={startDate} onChange={handleDateChange} className="bg-dark-bg-secondary text-dark-text-primary rounded-md py-2 px-3 w-full" />
-          <FiCalendar className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-text-primary pointer-events-none" />
+          {/* O padding da direita (pr-8) foi removido no mobile e adicionado apenas para desktop (md:pr-8) */}
+          <input type="date" name="startDate" value={startDate} onChange={handleDateChange} className="bg-dark-bg-secondary text-dark-text-primary rounded-md py-2 px-3 md:pr-8 w-full" />
+          {/* AQUI: O ícone agora fica escondido ('hidden') e só aparece em ecrãs médios ou maiores ('md:block') */}
+          <FiCalendar className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-dark-text-primary pointer-events-none" />
         </div>
         <div className="relative w-1/2 md:w-auto">
           <label className="text-xs text-dark-text-secondary absolute -top-2 left-2 bg-dark-card px-1 z-10">Até</label>
-          <input type="date" name="endDate" value={endDate} onChange={handleDateChange} className="bg-dark-bg-secondary text-dark-text-primary rounded-md py-2 px-3 w-full" />
-          <FiCalendar className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-text-primary pointer-events-none" />
+          <input type="date" name="endDate" value={endDate} onChange={handleDateChange} className="bg-dark-bg-secondary text-dark-text-primary rounded-md py-2 px-3 md:pr-8 w-full" />
+          <FiCalendar className="hidden md:block absolute right-3 top-1/2 -translate-y-1/2 text-dark-text-primary pointer-events-none" />
         </div>
       </div>
     </div>
