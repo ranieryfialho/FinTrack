@@ -1,9 +1,3 @@
-Com certeza\! Com base em todos os ficheiros do seu projeto, criei um `README.md` completo e bem estruturado que pode usar. Ele detalha as funcionalidades, as tecnologias utilizadas e como outros programadores podem instalar e executar o seu projeto localmente.
-
-Pode copiar e colar o conteúdo abaixo diretamente num ficheiro chamado `README.md` na pasta principal do seu projeto.
-
------
-
 # FinTrack: O Seu Assistente Pessoal de Finanças
 
 O FinTrack é uma aplicação web completa, desenhada para ajudar os utilizadores a gerir as suas finanças pessoais de forma intuitiva e eficiente. Com ele, é possível ter uma visão clara das receitas e despesas, definir e acompanhar metas financeiras, e até mesmo partilhar um ambiente financeiro com outras pessoas, como a família.
