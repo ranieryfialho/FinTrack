@@ -9,6 +9,8 @@ import CategoryChart from '../components/CategoryChart';
 import TransactionFilters from '../components/TransactionFilters';
 import ImportInvoiceModal from '../components/ImportInvoiceModal';
 import axios from 'axios';
+// 1. IMPORTAR O NOVO COMPONENTE DE SKELETON
+import DashboardSkeleton from '../components/DashboardSkeleton';
 
 const getMonthDateRange = (date) => {
     const referenceDate = date instanceof Date && !isNaN(date) ? date : new Date();
@@ -190,7 +192,7 @@ const Dashboard = () => {
             direction: prevConfig.key === key && prevConfig.direction === 'ascending' ? 'descending' : 'ascending'
         }));
     };
-
+    
     const handleLogout = async () => {
         try {
           await logout();
@@ -257,8 +259,11 @@ const Dashboard = () => {
 
     const totalPages = Math.ceil(sortedTransactions.length / pageSize) || 1;
 
-    if (authLoading) {
-        return <div className="flex items-center justify-center h-screen"><div className="loader"></div></div>;
+    // 2. ALTERAR A VERIFICAÇÃO DE CARREGAMENTO
+    // Juntamos o carregamento da autenticação e dos dados. Enquanto qualquer um dos dois for verdadeiro,
+    // ou se ainda não tivermos filtros definidos, mostramos o esqueleto.
+    if (authLoading || dataLoading || !filters.startDate) {
+        return <DashboardSkeleton />;
     }
 
     return (
@@ -266,7 +271,7 @@ const Dashboard = () => {
             <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-dark-text-primary">Visão Geral</h1>
-                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}! 👋</p>
+                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}!</p>
                 </div>
                 <button 
                     onClick={handleLogout} 
@@ -298,47 +303,44 @@ const Dashboard = () => {
                     </div>
                 </div>
             </div>
-
-            {dataLoading ? (
-                 <div className="flex items-center justify-center h-64"><div className="loader"></div></div>
-            ) : (
-                <div>
-                    <div className="bg-dark-card p-6 rounded-lg">
-                        <h2 className="text-xl font-semibold mb-4 text-dark-text-primary">Histórico de Transações</h2>
-                        {error && <p className="text-red-400 text-center">{error}</p>}
-                        
-                        {transactions.length > 0 ? (
-                            <>
-                                <TransactionsTable
-                                    transactions={paginatedTransactions}
-                                    onEdit={setEditingTransaction}
-                                    onDelete={handleDelete}
-                                    onSort={handleSort}
-                                    sortConfig={sortConfig}
-                                    getCategoryStyle={getCategoryStyle}
-                                />
-                                <div className="flex justify-between items-center mt-4 text-dark-text-primary">
-                                    <button 
-                                        onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
-                                        disabled={currentPage === 1} 
-                                        className="px-3 py-1 rounded bg-dark-bg-secondary disabled:opacity-50 flex items-center hover:bg-dark-border"
-                                    >
-                                        <FiChevronLeft className="mr-1" /> Anterior
-                                    </button>
-                                    <span>Página {currentPage} de {totalPages}</span>
-                                    <button 
-                                        onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
-                                        disabled={currentPage === totalPages} 
-                                        className="px-3 py-1 rounded bg-dark-bg-secondary disabled:opacity-50 flex items-center hover:bg-dark-border"
-                                    >
-                                        Próxima <FiChevronRight className="ml-1" />
-                                    </button>
-                                </div>
-                            </>
-                        ) : <p className="text-dark-text-secondary text-center py-8">Nenhuma transação encontrada para os filtros selecionados.</p>}
-                    </div>
+            
+            {/* 3. REMOVIDA A VERIFICAÇÃO DE dataLoading DAQUI, POIS JÁ FOI FEITA ACIMA */}
+            <div>
+                <div className="bg-dark-card p-6 rounded-lg">
+                    <h2 className="text-xl font-semibold mb-4 text-dark-text-primary">Histórico de Transações</h2>
+                    {error && <p className="text-red-400 text-center">{error}</p>}
+                    
+                    {transactions.length > 0 ? (
+                        <>
+                            <TransactionsTable
+                                transactions={paginatedTransactions}
+                                onEdit={setEditingTransaction}
+                                onDelete={handleDelete}
+                                onSort={handleSort}
+                                sortConfig={sortConfig}
+                                getCategoryStyle={getCategoryStyle}
+                            />
+                            <div className="flex justify-between items-center mt-4 text-dark-text-primary">
+                                <button 
+                                    onClick={() => setCurrentPage(p => Math.max(1, p - 1))} 
+                                    disabled={currentPage === 1} 
+                                    className="px-3 py-1 rounded bg-dark-bg-secondary disabled:opacity-50 flex items-center hover:bg-dark-border"
+                                >
+                                    <FiChevronLeft className="mr-1" /> Anterior
+                                </button>
+                                <span>Página {currentPage} de {totalPages}</span>
+                                <button 
+                                    onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} 
+                                    disabled={currentPage === totalPages} 
+                                    className="px-3 py-1 rounded bg-dark-bg-secondary disabled:opacity-50 flex items-center hover:bg-dark-border"
+                                >
+                                    Próxima <FiChevronRight className="ml-1" />
+                                </button>
+                            </div>
+                        </>
+                    ) : <p className="text-dark-text-secondary text-center py-8">Nenhuma transação encontrada para os filtros selecionados.</p>}
                 </div>
-            )}
+            </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="bg-dark-card p-6 rounded-lg flex flex-col min-h-[400px]">
