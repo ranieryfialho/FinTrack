@@ -9,7 +9,6 @@ import CategoryChart from '../components/CategoryChart';
 import TransactionFilters from '../components/TransactionFilters';
 import ImportInvoiceModal from '../components/ImportInvoiceModal';
 import axios from 'axios';
-// 1. IMPORTAR O NOVO COMPONENTE DE SKELETON
 import DashboardSkeleton from '../components/DashboardSkeleton';
 
 const getMonthDateRange = (date) => {
@@ -259,9 +258,6 @@ const Dashboard = () => {
 
     const totalPages = Math.ceil(sortedTransactions.length / pageSize) || 1;
 
-    // 2. ALTERAR A VERIFICAÇÃO DE CARREGAMENTO
-    // Juntamos o carregamento da autenticação e dos dados. Enquanto qualquer um dos dois for verdadeiro,
-    // ou se ainda não tivermos filtros definidos, mostramos o esqueleto.
     if (authLoading || dataLoading || !filters.startDate) {
         return <DashboardSkeleton />;
     }
@@ -271,7 +267,7 @@ const Dashboard = () => {
             <header className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-6">
                 <div>
                     <h1 className="text-3xl font-bold text-dark-text-primary">Visão Geral</h1>
-                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}!</p>
+                    <p className="text-dark-text-secondary mt-1">Bem-vindo(a) de volta, {currentUser?.displayName || currentUser?.email}! 👋</p>
                 </div>
                 <button 
                     onClick={handleLogout} 
